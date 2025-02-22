@@ -1,34 +1,33 @@
-name: Run Spoonacular Scraper
+name: Run Firebase Fetch
 
 on:
+  push:
+    branches:
+      - main  # Déclencher le script à chaque push sur la branche main
   schedule:
-    - cron: "0 0 * * *"  # Exécute tous les jours à minuit UTC
+    - cron: "0 0 * * *"  # Exécuter tous les jours à minuit UTC
 
 jobs:
-  run-script:
+  fetch_data:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère le code du repo
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Firebase Key File
+        run: echo "${{ secrets.FIREBASE_KEY }}" > firebase-key.json
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"  # Ajuste selon la version utilisée
+          python-version: '3.9'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt  # Installe les dépendances
+      - name: Install Dependencies
+        run: pip install -r requirements.txt  # Si nécessaire
 
-      - name: Run script
-        run: python script1.py && python script2.py  # Lance tes scripts
+      - name: Run Script
+        run: python fetch_all_ingredients.py  # Remplace par ton script
 
-      - name: Commit and push results
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add .
-          git commit -m "Mise à jour des données"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cleanup
+        run: rm firebase-key.json  # Supprime la clé après exécution
