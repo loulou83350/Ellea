@@ -1,0 +1,35 @@
+name: Fetch Ingredient Details
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Exécute tous les jours à 03h00 UTC (04h00 ou 05h00 en France)
+  workflow_dispatch:  # Permet de lancer manuellement depuis GitHub Actions
+
+jobs:
+  fetch-details:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout du repo
+        uses: actions/checkout@v4
+
+      - name: 🐍 Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: 📦 Installer les dépendances
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: 🔑 Définir la clé Firebase
+        run: echo "$FIREBASE_KEY" > firebase_key.json
+        env:
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+
+      - name: 🚀 Lancer le script de récupération des détails
+        run: |
+          source .venv/bin/activate
+          python fetch_ingredient_details.py
