@@ -5,22 +5,26 @@ import time
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# 🔑 Récupérer la clé Firebase depuis GitHub Secrets (via les variables d'environnement)
+# 🔑 Récupérer la clé Firebase depuis les variables d'environnement
 firebase_key_json = os.getenv("FIREBASE_KEY")
 
 if not firebase_key_json:
     raise ValueError("❌ Clé Firebase non définie ! Vérifie tes variables d'environnement.")
 
-# 📥 Charger la clé Firebase depuis JSON
-cred_dict = json.loads(firebase_key_json)
-cred = credentials.Certificate(cred_dict)
+try:
+    # 📥 Charger la clé Firebase depuis la variable d'environnement (et non un fichier)
+    cred_dict = json.loads(firebase_key_json)
+    cred = credentials.Certificate(cred_dict)
 
-# 🔥 Initialiser Firebase
-firebase_admin.initialize_app(cred)
-db = firestore.client()
-print("✅ Connexion à Firebase réussie !")
+    # 🔥 Initialiser Firebase
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+    print("✅ Connexion à Firebase réussie !")
 
-# 📂 Charger la liste des ingrédients depuis all_ingredients.json
+except json.JSONDecodeError:
+    raise ValueError("❌ Erreur : Impossible de parser la clé Firebase. Vérifie le format JSON.")
+
+# 📂 Charger la liste des ingrédients
 with open("all_ingredients.json", "r", encoding="utf-8") as f:
     ingredients = json.load(f)
 

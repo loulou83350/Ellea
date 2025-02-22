@@ -24,12 +24,9 @@ jobs:
           source .venv/bin/activate
           pip install -r requirements.txt
 
-      - name: 🔑 Définir la clé Firebase
-        run: echo "$FIREBASE_KEY" > firebase_key.json
+      - name: 🚀 Lancer le script de récupération des détails
         env:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
-
-      - name: 🚀 Lancer le script de récupération des détails
         run: |
           source .venv/bin/activate
           python fetch_ingredient_details.py
